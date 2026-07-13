@@ -44,5 +44,25 @@
       10,
       20
     ]
+  },
+  {
+    "model": "GMF",
+    "emb_dim": 64,
+    "lr": 0.001,
+    "epochs_trained": 30,
+    "metrics": {
+      "hit_rate@5": 0.230571,
+      "ndcg@5": 0.158648,
+      "hit_rate@10": 0.309575,
+      "ndcg@10": 0.184099,
+      "hit_rate@20": 0.412194,
+      "ndcg@20": 0.209891,
+      "best_val_hr@10": 0.290683
+    },
+    "duration_s": 135.18,
+    "k_values": [
+      5,
+      10
+    ]
   }
 ]
