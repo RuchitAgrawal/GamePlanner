@@ -64,5 +64,31 @@
       5,
       10
     ]
+  },
+  {
+    "model": "NeuMF",
+    "emb_dim": 64,
+    "mlp_layers": [
+      128,
+      64,
+      32
+    ],
+    "mlp_lr": 0.001,
+    "finetune_lr": 0.0001,
+    "epochs_finetuned": 30,
+    "metrics": {
+      "hit_rate@5": 0.207815,
+      "ndcg@5": 0.144715,
+      "hit_rate@10": 0.288106,
+      "ndcg@10": 0.170517,
+      "hit_rate@20": 0.376986,
+      "ndcg@20": 0.193061,
+      "best_val_hr@10": 0.289395
+    },
+    "duration_s": 341.93,
+    "k_values": [
+      5,
+      10
+    ]
   }
 ]
