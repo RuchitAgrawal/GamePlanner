@@ -66,3 +66,20 @@ class GMF(nn.Module):
 
     def get_item_embedding(self, item: torch.Tensor) -> torch.Tensor:
         return self.item_emb(item)
+
+    @torch.no_grad()
+    def score_all_items(
+        self, user: torch.Tensor, num_items: int, device: torch.device
+    ) -> torch.Tensor:
+        """
+        Score all items for a single user in batches.
+        Returns a (num_items,) tensor of logits, ready for top-k selection.
+        """
+        self.eval()
+        all_items = torch.arange(num_items, dtype=torch.long, device=device)
+        scores = []
+        for start in range(0, num_items, 2048):
+            batch = all_items[start:start + 2048]
+            u = user.expand(len(batch))
+            scores.append(self(u, batch).cpu())
+        return torch.cat(scores)

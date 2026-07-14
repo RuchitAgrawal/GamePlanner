@@ -111,7 +111,7 @@ def recommend_with_explanations(user_id: str, k: int = DEFAULT_TOP_K, state=Depe
             item_id=rec.item_id,
             user_history=user_history,
         )
-        explained_recs.append(ItemResult(**rec.model_dump(), explanation=explanation))
+        explained_recs.append(ItemResult(**rec.model_dump(exclude={"explanation"}), explanation=explanation))
 
     return ExplainResponse(user_id=user_id, recommendations=explained_recs,
                            source=base.source, count=len(explained_recs))

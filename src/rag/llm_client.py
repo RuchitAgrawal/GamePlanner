@@ -50,8 +50,8 @@ class LLMClient:
             try:
                 from google import genai
                 self._gemini_client = genai.Client(api_key=gemini_key)
-                self._gemini_model = "gemini-2.0-flash-lite"
-                log.info("Gemini 2.0 Flash Lite client ready")
+                self._gemini_model = "gemini-2.5-flash-lite"
+                log.info("Gemini 2.5 Flash Lite client ready (1000 req/day, 15 req/min)")
             except ImportError:
                 log.warning("google-genai not installed. Run: pip install google-genai")
 
@@ -77,26 +77,26 @@ class LLMClient:
         """
         Generate a short text response grounded in the given context.
 
-        Tries Groq first (free, fast). Falls back to Gemini if Groq is unavailable.
-        Returns an empty string if both fail, so callers can handle the fallback gracefully.
+        Tries Gemini 2.5 Flash Lite first (1000 req/day free).
+        Falls back to Groq if Gemini is unavailable or quota is hit.
+        Returns an empty string if both fail.
         """
         full_prompt = f"{prompt}\n\nContext:\n{context}" if context else prompt
 
-        # Groq primary — free tier, no daily cap issues
-        if self._groq_client:
-            result = self._generate_groq(full_prompt, "")
-            if result:
-                return result
-            log.warning("Groq returned empty. Trying Gemini fallback.")
-
-        # Gemini fallback
+        # Gemini primary
         if self._gemini_client and self._request_count < _DAILY_LIMIT:
             try:
                 result = self._generate_gemini(full_prompt)
                 self._request_count += 1
                 return result
             except Exception as exc:
-                log.warning("Gemini call failed (%s).", exc)
+                log.warning("Gemini call failed (%s). Trying Groq fallback.", exc)
+
+        # Groq fallback
+        if self._groq_client:
+            result = self._generate_groq(full_prompt, "")
+            if result:
+                return result
 
         log.error("Both LLM clients failed. Returning empty response.")
         return ""

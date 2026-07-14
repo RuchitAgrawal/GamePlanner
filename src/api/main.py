@@ -13,7 +13,7 @@ import torch
 from fastapi import FastAPI
 
 from src.api.routes import router
-from src.models.neural_cf import NeuMF
+from src.models.matrix_factorization import GMF
 from src.models.baseline import PopularityRecommender
 from src.rag.vector_store import VectorStore
 from src.rag.llm_client import LLMClient
@@ -23,7 +23,7 @@ from src.rag.conversational import ConversationalRecommender
 from src.utils.cache import ExplanationCache
 from src.utils.config import (
     API_PREFIX,
-    EMBEDDING_DIM, MLP_LAYERS, DROPOUT,
+    EMBEDDING_DIM,
     MODELS_DIR, USER2IDX_PATH, ITEM2IDX_PATH,
     TRAIN_PATH, ITEMS_META_PATH,
 )
@@ -62,18 +62,17 @@ async def startup():
     state.num_items = len(item2idx)
     log.info("Users: %d | Items: %d", state.num_users, state.num_items)
 
-    # Load NeuMF model
-    checkpoint_path = MODELS_DIR / "neumf_best.pt"
+    # Load GMF model (best-performing: HR@10=0.3096)
+    checkpoint_path = MODELS_DIR / "gmf_best.pt"
     if checkpoint_path.exists():
-        state.model = NeuMF(state.num_users, state.num_items,
-                            emb_dim=EMBEDDING_DIM, layers=MLP_LAYERS, dropout=DROPOUT)
+        state.model = GMF(state.num_users, state.num_items, emb_dim=EMBEDDING_DIM)
         state.model.load_state_dict(torch.load(checkpoint_path, map_location=state.device))
         state.model.to(state.device)
         state.model.eval()
-        state.model_name = "NeuMF"
-        log.info("Loaded NeuMF from %s", checkpoint_path)
+        state.model_name = "GMF"
+        log.info("Loaded GMF from %s", checkpoint_path)
     else:
-        log.warning("NeuMF checkpoint not found at %s. /recommend will use popularity fallback.", checkpoint_path)
+        log.warning("GMF checkpoint not found at %s. /recommend will use popularity fallback.", checkpoint_path)
         state.model = None
         state.model_name = "popularity_fallback"
 
