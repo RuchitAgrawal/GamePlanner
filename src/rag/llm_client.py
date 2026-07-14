@@ -1,8 +1,8 @@
 """
 LLM client for generating explanations and conversational responses.
 
-Primary: Gemini 1.5 Flash (free tier, 1500 req/day).
-Fallback: Groq (also free, faster, rate-limited differently).
+Primary: Gemini 2.0 Flash (google-genai SDK, free tier, 1500 req/day).
+Fallback: Groq llama-3.1-8b-instant (also free, faster, rate-limited differently).
 
 Keeps a session-level request counter and warns when approaching the daily limit.
 Temperature is kept low (0.3) to minimize hallucination in grounded explanations.
@@ -12,7 +12,6 @@ import logging
 import os
 from typing import Literal
 
-import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,7 +22,7 @@ _DAILY_LIMIT = 1400  # warn at this threshold (Gemini free tier is 1500/day)
 
 class LLMClient:
     """
-    Wrapper around Gemini 1.5 Flash with optional Groq fallback.
+    Wrapper around Gemini 2.0 Flash with optional Groq fallback.
 
     Usage:
         client = LLMClient()
@@ -48,15 +47,14 @@ class LLMClient:
         self._groq_client = None
 
         if gemini_key:
-            genai.configure(api_key=gemini_key)
-            self._gemini_client = genai.GenerativeModel(
-                model_name="gemini-1.5-flash",
-                generation_config=genai.GenerationConfig(
-                    max_output_tokens=max_tokens,
-                    temperature=temperature,
-                ),
-            )
-            log.info("Gemini 1.5 Flash client ready")
+            try:
+                from google import genai
+                self._gemini_client = genai.Client(api_key=gemini_key)
+                self._gemini_model = "gemini-2.0-flash-lite"
+                log.info("Gemini 2.0 Flash Lite client ready")
+            except ImportError:
+                log.warning("google-genai not installed. Run: pip install google-genai")
+
         else:
             log.warning("No GEMINI_API_KEY found. Gemini will not be available.")
 
@@ -79,31 +77,40 @@ class LLMClient:
         """
         Generate a short text response grounded in the given context.
 
-        Tries Gemini first. Falls back to Groq if Gemini is unavailable or quota is hit.
+        Tries Groq first (free, fast). Falls back to Gemini if Groq is unavailable.
         Returns an empty string if both fail, so callers can handle the fallback gracefully.
         """
-        if self._request_count >= _DAILY_LIMIT:
-            log.warning("Approaching daily Gemini limit (%d requests). Switching to Groq.", _DAILY_LIMIT)
-            return self._generate_groq(prompt, context)
-
         full_prompt = f"{prompt}\n\nContext:\n{context}" if context else prompt
 
-        if self._gemini_client:
+        # Groq primary — free tier, no daily cap issues
+        if self._groq_client:
+            result = self._generate_groq(full_prompt, "")
+            if result:
+                return result
+            log.warning("Groq returned empty. Trying Gemini fallback.")
+
+        # Gemini fallback
+        if self._gemini_client and self._request_count < _DAILY_LIMIT:
             try:
                 result = self._generate_gemini(full_prompt)
                 self._request_count += 1
                 return result
             except Exception as exc:
-                log.warning("Gemini call failed (%s). Trying Groq fallback.", exc)
-
-        if self._groq_client:
-            return self._generate_groq(full_prompt, "")
+                log.warning("Gemini call failed (%s).", exc)
 
         log.error("Both LLM clients failed. Returning empty response.")
         return ""
 
     def _generate_gemini(self, prompt: str) -> str:
-        response = self._gemini_client.generate_content(prompt)
+        from google import genai
+        response = self._gemini_client.models.generate_content(
+            model=self._gemini_model,
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                max_output_tokens=self.max_tokens,
+                temperature=self.temperature,
+            ),
+        )
         return response.text.strip()
 
     def _generate_groq(self, prompt: str, context: str) -> str:
@@ -113,7 +120,18 @@ class LLMClient:
         try:
             completion = self._groq_client.chat.completions.create(
                 model="llama-3.1-8b-instant",
-                messages=[{"role": "user", "content": full_prompt}],
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a concise game recommendation assistant. "
+                            "You MUST only reference games explicitly mentioned in the prompt. "
+                            "Do NOT invent, assume, or reference any game not listed. "
+                            "Write exactly 1-2 sentences."
+                        ),
+                    },
+                    {"role": "user", "content": full_prompt},
+                ],
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
             )

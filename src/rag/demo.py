@@ -79,6 +79,12 @@ def run():
     num_users = int(train_df["user_idx"].max()) + 1
     num_items = int(train_df["item_idx"].max()) + 1
 
+    # item_idx (int) -> item_id (string game name) lookup from metadata
+    item_idx_to_id: dict[int, str] = {
+        int(row["item_idx"]): str(row["item_id"])
+        for _, row in meta.iterrows()
+    }
+
     # idx -> game_name lookup
     idx_to_game: dict[int, str] = {}
     for _, row in meta.iterrows():
@@ -130,7 +136,10 @@ def run():
 
     vectors, idx_to_itemid_faiss = load_item_embeddings()
     store = VectorStore()
-    store.build(vectors, idx_to_itemid_faiss)
+    if (MODELS_DIR.parent / "data" / "embeddings" / "faiss_index.bin").exists():
+        store.load()
+    else:
+        store.build(vectors, idx_to_itemid_faiss)
 
     llm = LLMClient()
     cache = ExplanationCache(str(CACHE_PATH))
@@ -145,8 +154,9 @@ def run():
     # Build user history in the format the pipeline expects
     user_history = []
     for _, row in user_train.iterrows():
-        item_id = str(idx_to_itemid_faiss.get(int(row["item_idx"]), row["item_idx"]))
-        game = idx_to_game.get(int(row["item_idx"]), "Unknown")
+        item_idx = int(row["item_idx"])
+        item_id = item_idx_to_id.get(item_idx, str(item_idx))
+        game = idx_to_game.get(item_idx, "Unknown")
         user_history.append({
             "item_id": item_id,
             "title": game,
@@ -154,7 +164,7 @@ def run():
         })
 
     for rank, item_idx in enumerate(recs, 1):
-        item_id = str(idx_to_itemid_faiss.get(item_idx, item_idx))
+        item_id = item_idx_to_id.get(item_idx, str(item_idx))
         game = idx_to_game.get(item_idx, f"item_{item_idx}")
         print(f"\n{rank}. {game}")
 
