@@ -30,7 +30,7 @@ ITEM_VECTORS_PATH = DATA_EMBEDDINGS_DIR / "item_vectors.npy"
 FAISS_INDEX_PATH = DATA_EMBEDDINGS_DIR / "faiss_index.bin"
 IDX_TO_ITEMID_PATH = DATA_EMBEDDINGS_DIR / "idx_to_itemid.json"
 
-EXPERIMENTS_PATH = ROOT_DIR / "experiments.json"
+EXPERIMENTS_PATH = ROOT_DIR / "data" / "processed" / "experiments.json"
 CACHE_PATH = ROOT_DIR / "explanations_cache.json"
 
 # ── Data preprocessing ────────────────────────────────────────────────────────

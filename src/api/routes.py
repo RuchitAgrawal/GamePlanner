@@ -51,10 +51,11 @@ def metrics(state=Depends(get_state)):
         runs = json.load(f)
     if not runs:
         raise HTTPException(status_code=404, detail="experiments.json is empty")
-    latest = runs[-1] if isinstance(runs, list) else runs
+    # Return the best run by HR@10 (production model)
+    best = max(runs, key=lambda r: r.get("metrics", {}).get("hit_rate@10", 0))
     return MetricsResponse(
-        model=latest.get("model", "unknown"),
-        metrics=latest.get("metrics", {}),
+        model=best.get("model", "unknown"),
+        metrics=best.get("metrics", {}),
         k_values=TOP_K,
     )
 
