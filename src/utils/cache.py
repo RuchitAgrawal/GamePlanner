@@ -32,10 +32,14 @@ class ExplanationCache:
         self._load()
 
     def _load(self) -> None:
-        if self.cache_path.exists():
-            with open(self.cache_path, "r", encoding="utf-8") as f:
-                self._data = json.load(f)
-            log.info("Loaded explanation cache: %d entries", len(self._data))
+        if self.cache_path.exists() and self.cache_path.stat().st_size > 0:
+            try:
+                with open(self.cache_path, "r", encoding="utf-8") as f:
+                    self._data = json.load(f)
+                log.info("Loaded explanation cache: %d entries", len(self._data))
+            except json.JSONDecodeError:
+                log.warning("Cache file %s is corrupt, starting fresh", self.cache_path)
+                self._data = {}
         else:
             log.info("No existing cache found, starting fresh")
 
