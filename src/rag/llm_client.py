@@ -1,7 +1,7 @@
 """
 LLM client for generating explanations and conversational responses.
 
-Primary: Gemini 2.5 Flash Lite (google-genai SDK, free tier, 1000 req/day, 15 req/min).
+Primary: Gemini 2.0 Flash Lite (google-genai SDK, free tier, 1500 req/day, 30 req/min).
 Fallback: Groq llama-3.1-8b-instant (also free, faster, rate-limited differently).
 
 Keeps a session-level request counter and warns when approaching the daily limit.
@@ -10,6 +10,7 @@ Temperature is kept low (0.3) to minimize hallucination in grounded explanations
 
 import logging
 import os
+import time
 from typing import Literal
 
 from dotenv import load_dotenv
@@ -17,7 +18,9 @@ from dotenv import load_dotenv
 load_dotenv()
 log = logging.getLogger(__name__)
 
-_DAILY_LIMIT = 900  # warn at this threshold (Gemini 2.5 Flash Lite free tier is 1000/day)
+_DAILY_LIMIT = 1350  # warn at this threshold (Gemini 2.0 Flash Lite free tier: 1500/day)
+_MAX_RETRIES = 2     # retry on 429 rate-limit before falling back to Groq
+_RETRY_DELAY = 5     # seconds to wait between retries (respects 30 req/min limit)
 
 
 class LLMClient:
@@ -84,14 +87,37 @@ class LLMClient:
         """
         full_prompt = f"{prompt}\n\nContext:\n{context}" if context else prompt
 
-        # Gemini primary
+        # Gemini primary (with smart 429 retry)
         if self._gemini_client and self._request_count < _DAILY_LIMIT:
-            try:
-                result = self._generate_gemini(full_prompt)
-                self._request_count += 1
-                return result
-            except Exception as exc:
-                log.warning("Gemini call failed (%s). Trying Groq fallback.", exc)
+            for attempt in range(_MAX_RETRIES + 1):
+                try:
+                    result = self._generate_gemini(full_prompt)
+                    self._request_count += 1
+                    if self._request_count >= _DAILY_LIMIT:
+                        log.warning(
+                            "Approaching Gemini daily limit (%d requests). "
+                            "Groq fallback will activate soon.",
+                            self._request_count,
+                        )
+                    return result
+                except Exception as exc:
+                    err_str = str(exc)
+                    is_rate_limited = "429" in err_str
+                    # Daily quota exhaustion: no point retrying, go straight to Groq
+                    is_daily_quota = "PerDay" in err_str or "limit: 0" in err_str
+                    if is_rate_limited and not is_daily_quota and attempt < _MAX_RETRIES:
+                        wait = _RETRY_DELAY * (attempt + 1)
+                        log.warning(
+                            "Gemini rate-limited per-minute (attempt %d/%d). Retrying in %ds.",
+                            attempt + 1, _MAX_RETRIES, wait,
+                        )
+                        time.sleep(wait)
+                    else:
+                        if is_daily_quota:
+                            log.warning("Gemini daily quota exhausted. Switching to Groq fallback.")
+                        else:
+                            log.warning("Gemini call failed (%s). Trying Groq fallback.", exc)
+                        break
 
         # Groq fallback
         if self._groq_client:
