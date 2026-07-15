@@ -12,6 +12,8 @@ from contextlib import asynccontextmanager
 import pandas as pd
 import torch
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src.api.routes import router
 from src.models.matrix_factorization import GMF
@@ -52,6 +54,24 @@ app = FastAPI(
 )
 
 app.include_router(router, prefix=API_PREFIX)
+
+# CORS — allow any origin in dev; tighten for production if needed
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+# Serve the frontend — must come AFTER API routes so /api/v1/* resolves first
+_FRONTEND_DIR = __file__.replace("/src/api/main.py", "/frontend").replace("\\", "/")
+import os as _os
+_frontend_path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(__file__))), "frontend")
+if _os.path.isdir(_frontend_path):
+    app.mount("/", StaticFiles(directory=_frontend_path, html=True), name="frontend")
+    log.info("Frontend mounted from %s", _frontend_path)
+else:
+    log.warning("frontend/ directory not found — UI not available")
 
 
 async def _startup(application: FastAPI):
