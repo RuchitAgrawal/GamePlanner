@@ -60,7 +60,7 @@ TOP_K = [5, 10]  # evaluation cutoffs
 SENTENCE_TRANSFORMER_MODEL = "all-MiniLM-L6-v2"
 EMBEDDING_BATCH_SIZE = 64
 
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash-lite"   # 1000 req/day, 15 req/min (free tier)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 GROQ_MODEL = "llama-3.1-8b-instant"

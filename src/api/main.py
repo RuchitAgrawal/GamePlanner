@@ -7,6 +7,7 @@ so every request handler can access them without re-loading from disk.
 
 import json
 import logging
+from contextlib import asynccontextmanager
 
 import pandas as pd
 import torch
@@ -24,6 +25,7 @@ from src.utils.cache import ExplanationCache
 from src.utils.config import (
     API_PREFIX,
     EMBEDDING_DIM,
+    FAISS_INDEX_PATH,
     MODELS_DIR, USER2IDX_PATH, ITEM2IDX_PATH,
     TRAIN_PATH, ITEMS_META_PATH,
 )
@@ -31,24 +33,31 @@ from src.utils.config import (
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)s  %(message)s")
 log = logging.getLogger(__name__)
 
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    """Load all models and shared state once at startup, release at shutdown."""
+    await _startup(application)
+    yield
+
+
 app = FastAPI(
-    title="GamePlanner - Steam Recommendation Engine",
+    title="GamePlanner — Steam Recommendation Engine",
     description=(
         "ML-powered game recommendation engine trained on Steam gameplay data. "
-        "Features collaborative filtering (NeuMF), explainable recommendations, "
+        "Features collaborative filtering (GMF), explainable recommendations, "
         "cold-start handling, and a conversational interface."
     ),
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.include_router(router, prefix=API_PREFIX)
 
 
-@app.on_event("startup")
-async def startup():
+async def _startup(application: FastAPI):
     log.info("Starting up GamePlanner API...")
 
-    state = app.state
+    state = application.state
     state.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     log.info("Device: %s", state.device)
 
@@ -107,7 +116,6 @@ async def startup():
 
     # FAISS vector store
     state.vector_store = VectorStore()
-    from src.utils.config import FAISS_INDEX_PATH
     if FAISS_INDEX_PATH.exists():
         state.vector_store.load()
     else:

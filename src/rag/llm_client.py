@@ -1,7 +1,7 @@
 """
 LLM client for generating explanations and conversational responses.
 
-Primary: Gemini 2.0 Flash (google-genai SDK, free tier, 1500 req/day).
+Primary: Gemini 2.5 Flash Lite (google-genai SDK, free tier, 1000 req/day, 15 req/min).
 Fallback: Groq llama-3.1-8b-instant (also free, faster, rate-limited differently).
 
 Keeps a session-level request counter and warns when approaching the daily limit.
@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 log = logging.getLogger(__name__)
 
-_DAILY_LIMIT = 1400  # warn at this threshold (Gemini free tier is 1500/day)
+_DAILY_LIMIT = 900  # warn at this threshold (Gemini 2.5 Flash Lite free tier is 1000/day)
 
 
 class LLMClient:
@@ -49,9 +49,10 @@ class LLMClient:
         if gemini_key:
             try:
                 from google import genai
+                from src.utils.config import GEMINI_MODEL
                 self._gemini_client = genai.Client(api_key=gemini_key)
-                self._gemini_model = "gemini-2.5-flash-lite"
-                log.info("Gemini 2.5 Flash Lite client ready (1000 req/day, 15 req/min)")
+                self._gemini_model = GEMINI_MODEL
+                log.info("Gemini %s client ready (1000 req/day, 15 req/min)", GEMINI_MODEL)
             except ImportError:
                 log.warning("google-genai not installed. Run: pip install google-genai")
 

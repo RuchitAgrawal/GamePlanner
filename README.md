@@ -22,9 +22,9 @@ The system is structured in two main layers:
 ## Tech Stack
 
 - **ML**: PyTorch, scikit-learn, pandas, numpy
-- **RAG**: sentence-transformers, FAISS, Gemini 1.5 Flash (free tier)
+- **RAG**: sentence-transformers, FAISS, Gemini 2.5 Flash Lite (free tier, 1000 req/day)
 - **API**: FastAPI, Pydantic, Uvicorn
-- **Tracking**: MLflow / experiments.json
+- **Tracking**: experiments.json (per-run metrics log)
 
 ## Project Structure
 
@@ -75,14 +75,12 @@ For quick development iteration, the [Kaggle Steam CSV](https://www.kaggle.com/d
 
 ## Results
 
-*(will be filled in after training)*
-
-| Model | P@5 | P@10 | NDCG@10 | HR@10 | Coverage |
+| Model | P@5 | P@10 | NDCG@10 | HR@10 | HR@5 |
 |---|---|---|---|---|---|
-| Popularity | - | - | - | - | - |
-| Content-Based | - | - | - | - | - |
-| MF | - | - | - | - | - |
-| NeuMF | - | - | - | - | - |
+| Popularity | - | - | 0.1352 | 0.2203 | 0.1696 |
+| Content-Based | - | - | 0.0940 | 0.1683 | 0.1172 |
+| GMF (ours) | - | - | **0.1841** | **0.3096** | 0.2306 |
+| NeuMF | - | - | 0.1705 | 0.2881 | 0.2078 |
 
 ## API Endpoints
 
@@ -100,5 +98,6 @@ For quick development iteration, the [Kaggle Steam CSV](https://www.kaggle.com/d
 - Time-based train/val/test split (leave-one-last) to simulate real deployment conditions
 - Playtime as implicit feedback, log-scaled confidence weighting
 - NeuMF initialized from separately pre-trained GMF and MLP weights (per original paper)
-- Gemini 1.5 Flash free tier with disk-backed explanation caching to stay within quota
-- FAISS CPU index (sub-millisecond at 10K items, no GPU needed for retrieval)
+- GMF outperforms NeuMF on this sparse dataset (97.85% sparsity, 2329 users × 1005 items) — MLP branch needs more data to generalize
+- Gemini 2.5 Flash Lite free tier (1000 req/day) with disk-backed explanation caching to stay within quota
+- FAISS CPU index (sub-millisecond at 1005 items, no GPU needed for retrieval)
