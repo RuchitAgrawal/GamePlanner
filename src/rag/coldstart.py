@@ -20,6 +20,10 @@ from src.utils.config import COLD_START_MULTIPLIER
 
 log = logging.getLogger(__name__)
 
+# ── Semantic note templates ────────────────────────────────────────────────────
+_SEED_NOTE_TMPL = "Recommended because it's semantically similar to {seed} in your profile."
+_EMBED_NOTE_TMPL = "Recommended based on the overall style and tone of your game preferences."
+
 
 class ColdStartHandler:
     """
@@ -48,50 +52,51 @@ class ColdStartHandler:
 
     def get_new_user_recommendations(
         self, liked_game_titles: list[str], k: int = 10
-    ) -> list[dict]:
+    ) -> tuple[list[dict], list[str]]:
         """
         Recommend games for a new user who provided a list of titles they've enjoyed.
 
-        Steps:
-        1. Look up item_ids for the provided titles.
-        2. Get their FAISS vectors and average into a pseudo-user vector.
-        3. Retrieve k * COLD_START_MULTIPLIER candidates from FAISS.
-        4. Remove input titles from results.
-        5. Return top-k by cosine score.
+        Returns:
+            (results, matched_seeds) where matched_seeds is the subset of
+            liked_game_titles that were found in our catalog.
         """
         if not liked_game_titles:
             log.warning("No liked games provided for cold-start")
-            return []
+            return [], []
 
         # Match titles to item_ids
-        matched_ids = []
+        matched_ids = []   # item_ids found in catalog
+        matched_titles = []  # corresponding display titles
         unmatched = []
         for title in liked_game_titles:
             item_id = self._title_to_item_id.get(title.lower())
             if item_id:
                 matched_ids.append(item_id)
+                matched_titles.append(title)
             else:
                 unmatched.append(title)
 
         if unmatched:
             log.info("Could not match these titles to catalog: %s", unmatched)
 
+        # Build per-seed vectors for F-E1 closest-seed computation
+        seed_vecs: list[np.ndarray] = []
         if matched_ids:
-            # Average the FAISS vectors of matched items
-            vecs = [self.vs.get_item_vector(iid) for iid in matched_ids]
-            vecs = [v for v in vecs if v is not None]
-            if vecs:
-                pseudo_vector = np.mean(vecs, axis=0)
-                pseudo_vector = pseudo_vector / (np.linalg.norm(pseudo_vector) + 1e-9)
-            else:
-                # Fall back to embedding the titles as text
-                pseudo_vector = self._embed_titles(liked_game_titles)
-        else:
-            # No matches at all: embed raw title strings
+            for iid in matched_ids:
+                v = self.vs.get_item_vector(iid)
+                if v is not None:
+                    seed_vecs.append(v)
+
+        if matched_ids and seed_vecs:
+            pseudo_vector = np.mean(seed_vecs, axis=0)
+            pseudo_vector = pseudo_vector / (np.linalg.norm(pseudo_vector) + 1e-9)
+        elif liked_game_titles:
             pseudo_vector = self._embed_titles(liked_game_titles)
+        else:
+            pseudo_vector = None
 
         if pseudo_vector is None:
-            return []
+            return [], matched_titles
 
         exclude = set(matched_ids)
         candidates = self.vs.retrieve_similar_items(
@@ -101,13 +106,59 @@ class ColdStartHandler:
         results = []
         for item_id, score in candidates[:k]:
             meta = self._get_meta(item_id)
+            title_str = meta.get("title", item_id) if meta else item_id
+
+            # F-E1: find which seed this result is closest to
+            closest_seed, semantic_note = self._compute_closest_seed(
+                item_id, matched_titles, seed_vecs
+            )
+
             results.append({
                 "item_id": item_id,
-                "title": meta.get("title", item_id) if meta else item_id,
+                "title": title_str,
                 "tags": meta.get("tags", "") if meta else "",
                 "score": round(score, 4),
+                "closest_seed": closest_seed,
+                "semantic_note": semantic_note,
             })
-        return results
+
+        return results, matched_titles
+
+    def _compute_closest_seed(
+        self,
+        item_id: str,
+        seed_titles: list[str],
+        seed_vecs: list[np.ndarray],
+    ) -> tuple[str | None, str | None]:
+        """
+        F-E1: Find which seed game this result item is most similar to.
+
+        Computes cosine similarity between the result's FAISS vector and each
+        seed vector. Returns the seed title + a human-readable semantic note.
+        Returns (None, None) if no seed vectors are available.
+        """
+        if not seed_vecs:
+            return None, _EMBED_NOTE_TMPL
+
+        result_vec = self.vs.get_item_vector(item_id)
+        if result_vec is None:
+            return None, None
+
+        # Cosine similarity (vectors are already L2-normalized in the index)
+        similarities = [
+            float(np.dot(result_vec, sv))
+            for sv in seed_vecs
+        ]
+        best_idx = int(np.argmax(similarities))
+        best_seed = seed_titles[best_idx] if best_idx < len(seed_titles) else None
+        best_score = similarities[best_idx]
+
+        if best_seed is None:
+            return None, None
+
+        note = _SEED_NOTE_TMPL.format(seed=best_seed)
+        log.debug("Item %s closest seed: %s (sim=%.3f)", item_id, best_seed, best_score)
+        return best_seed, note
 
     def get_new_item_proxy_score(
         self, item_id: str, item_popularity: dict[str, int], k_neighbors: int = 5
