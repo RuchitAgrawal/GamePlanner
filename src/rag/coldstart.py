@@ -183,6 +183,61 @@ class ColdStartHandler:
         scores = [item_popularity.get(nid, 0) for nid, _ in neighbors[:k_neighbors]]
         return float(np.mean(scores)) if scores else 0.0
 
+    def generate_summary(
+        self,
+        seed_titles: list[str],
+        result_titles: list[str],
+        llm_client,
+    ) -> str:
+        """
+        F-E2: Generate a 2-3 sentence LLM paragraph explaining why these games
+        were recommended given the user's seed games. Uses 1 LLM call total.
+
+        Cached by a hash of (sorted seed titles) so identical persona/coldstart
+        queries never re-call the LLM.
+
+        Args:
+            seed_titles: the games the user said they like.
+            result_titles: top recommended game titles (used as context).
+            llm_client: LLMClient instance (from app state).
+
+        Returns:
+            LLM-generated summary string, or empty string on failure.
+        """
+        import hashlib
+        cache_key = hashlib.md5(
+            ",".join(sorted(seed_titles)).encode()
+        ).hexdigest()
+
+        # In-process cache (per server lifetime)
+        if not hasattr(self, "_summary_cache"):
+            self._summary_cache: dict[str, str] = {}
+
+        if cache_key in self._summary_cache:
+            log.debug("Coldstart summary cache hit for seeds: %s", seed_titles)
+            return self._summary_cache[cache_key]
+
+        seeds_str = ", ".join(seed_titles) if seed_titles else "your game profile"
+        results_preview = ", ".join(result_titles[:5])
+
+        prompt = (
+            f"A user enjoys these games: {seeds_str}. "
+            f"Based on their taste, we've recommended: {results_preview} (and others). "
+            f"Write 2-3 sentences explaining what these games have in common with the user's profile "
+            f"and why they were recommended. Be specific about gameplay style, genre, or atmosphere. "
+            f"Do NOT reference any games not mentioned above."
+        )
+
+        try:
+            summary = llm_client.generate(prompt=prompt)
+            if summary:
+                self._summary_cache[cache_key] = summary
+                log.info("Generated coldstart summary for seeds: %s", seed_titles)
+            return summary
+        except Exception as exc:
+            log.warning("Coldstart summary generation failed: %s", exc)
+            return ""
+
     def _embed_titles(self, titles: list[str]) -> np.ndarray | None:
         """Embed a list of title strings and return their mean vector."""
         try:
@@ -198,3 +253,4 @@ class ColdStartHandler:
         if subset.empty:
             return None
         return subset.iloc[0].to_dict()
+

@@ -120,20 +120,47 @@ def recommend_with_explanations(user_id: str, k: int = DEFAULT_TOP_K, state=Depe
 
 @router.post("/coldstart", response_model=ColdStartResponse)
 def coldstart(body: ColdStartRequest, state=Depends(get_state)):
-    """New user recommendations from a list of liked game titles."""
-    results_raw = state.coldstart_handler.get_new_user_recommendations(
+    """New user recommendations from a list of liked game titles.
+
+    F-E1: Each result includes closest_seed + semantic_note (computed from FAISS cosine sim).
+    F-E2: Response includes an optional llm_summary paragraph (1 LLM call, cached by seed hash).
+    """
+    results_raw, matched_seeds = state.coldstart_handler.get_new_user_recommendations(
         liked_game_titles=body.liked_games, k=body.k
     )
+
     results = [
         ItemResult(
             item_id=r["item_id"],
             title=r["title"],
             tags=str(r.get("tags", "")),
             score=r["score"],
+            closest_seed=r.get("closest_seed"),
+            semantic_note=r.get("semantic_note"),
         )
         for r in results_raw
     ]
-    return ColdStartResponse(recommendations=results, count=len(results))
+
+    # F-E2: generate one LLM summary paragraph (1 call, cached)
+    llm_summary: str | None = None
+    if results and matched_seeds:
+        result_titles = [r.title for r in results]
+        try:
+            summary = state.coldstart_handler.generate_summary(
+                seed_titles=matched_seeds,
+                result_titles=result_titles,
+                llm_client=state.llm,
+            )
+            llm_summary = summary if summary else None
+        except Exception as exc:
+            log.warning("Could not generate coldstart summary: %s", exc)
+
+    return ColdStartResponse(
+        recommendations=results,
+        count=len(results),
+        llm_summary=llm_summary,
+        matched_seeds=matched_seeds,
+    )
 
 
 @router.post("/chat", response_model=ChatResponse)
