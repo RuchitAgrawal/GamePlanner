@@ -121,9 +121,11 @@ function renderCards(items, mode, label) {
 
   grid().innerHTML = normalised.map((item, idx) => {
     const title      = escHtml(item.title ?? item.item_id ?? `Game ${idx + 1}`);
-    const explanation= item.explanation
-      ? escHtml(item.explanation)
-      : '<em style="color:var(--text-faint)">No explanation available.</em>';
+    // Explanation priority: LLM explanation > semantic note (closest seed) > nothing
+    const explanationText = item.explanation || item.semantic_note || null;
+    const explanation = explanationText
+      ? escHtml(explanationText)
+      : '';
     const rawScore   = (item.score ?? item.similarity_score ?? 0).toFixed(3);
     const pct        = item._pct ?? 50;
 
@@ -131,7 +133,7 @@ function renderCards(items, mode, label) {
       <div class="game-card" id="card-${idx}">
         <div class="card-rank"># ${idx + 1}</div>
         <div class="card-title">${title}</div>
-        <div class="card-explanation">${explanation}</div>
+        ${explanation ? `<div class="card-explanation">${explanation}</div>` : ''}
         <div class="card-score-row">
           <span class="card-score-label">Relevance</span>
           <div class="card-score-bar">
