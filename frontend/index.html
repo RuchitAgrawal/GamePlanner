@@ -7,12 +7,12 @@
   <title>GamePlanner — Steam Recommendation Engine</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-  <!-- ── Navigation ─────────────────────────────────────────────── -->
+  <!-- ── Navigation ───────────────────────────────────────────── -->
   <nav id="navbar" class="navbar">
     <div class="nav-inner">
       <a href="#" class="nav-logo" id="nav-logo-link">
@@ -20,138 +20,221 @@
         <span class="logo-text">GamePlanner</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#demo" class="nav-link">Live Demo</a></li>
+        <li><a href="#discover" class="nav-link">Discover</a></li>
         <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
-        <li><a href="https://github.com/RuchitAgrawal/GamePlanner" target="_blank" rel="noopener" class="nav-link nav-link--github">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
-        </a></li>
+        <li>
+          <a href="https://github.com/RuchitAgrawal/GamePlanner" target="_blank" rel="noopener" class="nav-link nav-link--github">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
 
-  <!-- ── Hero ───────────────────────────────────────────────────── -->
+  <!-- ── Hero ─────────────────────────────────────────────────── -->
   <section id="hero" class="hero">
-    <div class="hero-bg">
-      <div class="dot-grid"></div>
-      <div class="hero-glow hero-glow--left"></div>
-      <div class="hero-glow hero-glow--right"></div>
-    </div>
+    <!-- Atmospheric orbs (decoration only) -->
+    <div class="orb orb--mint"></div>
+    <div class="orb orb--peach"></div>
+    <div class="orb orb--lavender"></div>
 
     <div class="hero-content">
-      <div class="hero-badge">
-        <span class="badge-dot"></span>
-        <span>42/42 tests passing · GMF HR@10: 30.96%</span>
-      </div>
+      <p class="hero-eyebrow">Steam · Collaborative Filtering · AI Explanations</p>
 
       <h1 class="hero-title">
-        Discover Your Next<br />
-        <span class="gradient-text">Favourite Game</span>
+        Discover Your<br />Next Game
       </h1>
 
       <p class="hero-subtitle">
-        ML-powered recommendations trained on Steam gameplay data.
-        Collaborative filtering · Semantic search · AI explanations.
+        A recommendation engine trained on 200K Steam gameplay sessions.
+        Powered by GMF collaborative filtering, FAISS semantic search,
+        and grounded AI explanations.
       </p>
 
       <div class="hero-ctas">
-        <a href="#demo" class="btn btn-primary" id="cta-cf" data-mode="cf">
-          <span>🎮</span> I'm a Steam User
+        <a href="#discover" class="btn btn-primary" id="cta-discover">
+          Explore Recommendations →
         </a>
-        <a href="#demo" class="btn btn-secondary" id="cta-coldstart" data-mode="coldstart">
-          <span>🌟</span> I'm New Here
-        </a>
-        <a href="#demo" class="btn btn-ghost" id="cta-chat" data-mode="chat">
-          <span>💬</span> Just Tell Me
+        <a href="#how-it-works" class="btn btn-outline">
+          How It Works
         </a>
       </div>
 
-      <!-- Live metrics banner -->
-      <div class="metrics-banner" id="metrics-banner">
-        <div class="metric-chip" id="metric-model">
-          <span class="metric-label">Model</span>
-          <span class="metric-value" id="mv-model">GMF</span>
-        </div>
-        <div class="metric-divider"></div>
-        <div class="metric-chip">
-          <span class="metric-label">HR@10</span>
-          <span class="metric-value accent-green" id="mv-hr10">30.96%</span>
-        </div>
-        <div class="metric-divider"></div>
-        <div class="metric-chip">
-          <span class="metric-label">NDCG@10</span>
-          <span class="metric-value accent-cyan" id="mv-ndcg10">18.41%</span>
-        </div>
-        <div class="metric-divider"></div>
-        <div class="metric-chip">
-          <span class="metric-label">vs Popularity</span>
-          <span class="metric-value accent-purple">+40.5%</span>
-        </div>
+      <!-- Live metrics caption -->
+      <div class="hero-metrics" id="hero-metrics">
+        <span class="hero-metric-badge" id="metric-model-badge">
+          <span id="mv-model">GMF</span>
+        </span>
+        <span class="hero-metric-sep">·</span>
+        <span>HR@10 <span class="hero-metric-val" id="mv-hr10">30.96%</span></span>
+        <span class="hero-metric-sep">·</span>
+        <span>NDCG@10 <span class="hero-metric-val" id="mv-ndcg10">18.41%</span></span>
+        <span class="hero-metric-sep">·</span>
+        <span>+40.5% vs popularity baseline</span>
       </div>
     </div>
 
-    <div class="hero-scroll-hint">
-      <span>Scroll to try it</span>
-      <div class="scroll-arrow"></div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
     </div>
   </section>
 
-  <!-- ── Demo ───────────────────────────────────────────────────── -->
-  <section id="demo" class="demo section">
+  <!-- ── Discovery ─────────────────────────────────────────────── -->
+  <section id="discover" class="discover section">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Try It <span class="gradient-text">Live</span></h2>
-        <p class="section-subtitle">Real recommendations from our trained model — hitting the live API</p>
+        <p class="section-label">Discover</p>
+        <h2 class="section-title">Find games tailored to you</h2>
+        <p class="section-sub">
+          Pick a gamer persona, build your taste profile, or just describe what you're looking for.
+        </p>
       </div>
 
-      <!-- Mode tabs -->
-      <div class="mode-tabs" role="tablist">
-        <button class="mode-tab active" role="tab" data-mode="cf" id="tab-cf" aria-selected="true">
-          <span class="tab-icon">🎮</span>
-          <span class="tab-label">Steam User</span>
-          <span class="tab-desc">CF Recommendations</span>
+      <!-- Discovery path switcher (pill toggle) -->
+      <div class="discover-paths" role="tablist">
+        <button class="path-btn active" role="tab" data-mode="cf" id="tab-cf" aria-selected="true">
+          Personas
         </button>
-        <button class="mode-tab" role="tab" data-mode="coldstart" id="tab-coldstart" aria-selected="false">
-          <span class="tab-icon">🌟</span>
-          <span class="tab-label">New Here</span>
-          <span class="tab-desc">Cold-Start</span>
+        <button class="path-btn" role="tab" data-mode="coldstart" id="tab-coldstart" aria-selected="false">
+          Build Your Profile
         </button>
-        <button class="mode-tab" role="tab" data-mode="chat" id="tab-chat" aria-selected="false">
-          <span class="tab-icon">💬</span>
-          <span class="tab-label">Just Tell Me</span>
-          <span class="tab-desc">Conversational</span>
+        <button class="path-btn" role="tab" data-mode="chat" id="tab-chat" aria-selected="false">
+          Describe It
         </button>
       </div>
 
-      <!-- ── Panel A: CF Recommendations -->
+      <!-- ── Panel A: Personas (CF) ───────────────────────────── -->
       <div class="mode-panel active" id="panel-cf" role="tabpanel" aria-labelledby="tab-cf">
-        <div class="panel-input-row">
-          <div class="input-wrapper">
-            <span class="input-icon">🔍</span>
-            <input type="text" id="user-id-input" class="text-input" placeholder="Enter Steam User ID (e.g. 11373749)" autocomplete="off" />
-          </div>
-          <button class="btn btn-primary" id="cf-submit">
-            Get Recommendations <span class="btn-arrow">→</span>
-          </button>
-        </div>
-        <div class="sample-pills">
-          <span class="sample-label">Try a sample user:</span>
-          <button class="pill" id="sample-11373749" data-user-id="11373749">11373749 <span class="pill-tag">active gamer</span></button>
-          <button class="pill" id="sample-5250" data-user-id="5250">5250 <span class="pill-tag">casual</span></button>
-        </div>
-      </div>
 
-      <!-- ── Panel B: Cold-Start -->
+        <p class="personas-intro">
+          Select the gamer archetype that feels most like you — we'll find recommendations
+          based on that taste profile using our trained collaborative filtering model.
+        </p>
+
+        <!-- 6 persona cards -->
+        <div class="personas-grid" id="personas-grid">
+
+          <!-- FPS Veteran -->
+          <div class="persona-card" id="persona-fps" data-persona="fps" tabindex="0" role="button" aria-label="Select FPS Veteran persona">
+            <div class="persona-orb persona-orb--sky"></div>
+            <div class="persona-icon">🎯</div>
+            <h3 class="persona-name">The FPS Veteran</h3>
+            <p class="persona-desc">Competitive precision, high-hours, ranked grind</p>
+            <div class="persona-seeds">
+              <span class="seed-tag">Counter-Strike</span>
+              <span class="seed-tag">Team Fortress 2</span>
+              <span class="seed-tag">Left 4 Dead 2</span>
+            </div>
+          </div>
+
+          <!-- Indie Explorer -->
+          <div class="persona-card" id="persona-indie" data-persona="indie" tabindex="0" role="button" aria-label="Select Indie Explorer persona">
+            <div class="persona-orb persona-orb--mint"></div>
+            <div class="persona-icon">🌿</div>
+            <h3 class="persona-name">The Indie Explorer</h3>
+            <p class="persona-desc">Story-first, atmospheric, hidden gems</p>
+            <div class="persona-seeds">
+              <span class="seed-tag">LIMBO</span>
+              <span class="seed-tag">Psychonauts</span>
+              <span class="seed-tag">Hollow Knight</span>
+            </div>
+          </div>
+
+          <!-- RPG Completionist -->
+          <div class="persona-card" id="persona-rpg" data-persona="rpg" tabindex="0" role="button" aria-label="Select RPG Completionist persona">
+            <div class="persona-orb persona-orb--lavender"></div>
+            <div class="persona-icon">⚔️</div>
+            <h3 class="persona-name">The RPG Completionist</h3>
+            <p class="persona-desc">Deep narratives, immersive worlds, 100% runs</p>
+            <div class="persona-seeds">
+              <span class="seed-tag">BioShock</span>
+              <span class="seed-tag">Fallout 3</span>
+              <span class="seed-tag">Skyrim</span>
+            </div>
+          </div>
+
+          <!-- Weekend Casual -->
+          <div class="persona-card" id="persona-casual" data-persona="casual" tabindex="0" role="button" aria-label="Select Weekend Casual persona">
+            <div class="persona-orb persona-orb--peach"></div>
+            <div class="persona-icon">🎮</div>
+            <h3 class="persona-name">The Weekend Casual</h3>
+            <p class="persona-desc">Pick up and play, fun with friends, no pressure</p>
+            <div class="persona-seeds">
+              <span class="seed-tag">Rocket League</span>
+              <span class="seed-tag">Portal 2</span>
+              <span class="seed-tag">Garry's Mod</span>
+            </div>
+          </div>
+
+          <!-- Survival Builder -->
+          <div class="persona-card" id="persona-survival" data-persona="survival" tabindex="0" role="button" aria-label="Select Survival Builder persona">
+            <div class="persona-orb persona-orb--rose"></div>
+            <div class="persona-icon">🏗️</div>
+            <h3 class="persona-name">The Survival Builder</h3>
+            <p class="persona-desc">Emergent gameplay, crafting, open-world sandbox</p>
+            <div class="persona-seeds">
+              <span class="seed-tag">Garry's Mod</span>
+              <span class="seed-tag">Terraria</span>
+              <span class="seed-tag">Don't Starve</span>
+            </div>
+          </div>
+
+          <!-- Atmosphere Hunter -->
+          <div class="persona-card" id="persona-atmos" data-persona="atmos" tabindex="0" role="button" aria-label="Select Atmosphere Hunter persona">
+            <div class="persona-orb persona-orb--lavender"></div>
+            <div class="persona-icon">🌑</div>
+            <h3 class="persona-name">The Atmosphere Hunter</h3>
+            <p class="persona-desc">Dark, unsettling, immersive, mood-driven</p>
+            <div class="persona-seeds">
+              <span class="seed-tag">Amnesia</span>
+              <span class="seed-tag">LIMBO</span>
+              <span class="seed-tag">BioShock Infinite</span>
+            </div>
+          </div>
+
+        </div><!-- /personas-grid -->
+
+        <!-- Research mode (demoted) -->
+        <div class="research-mode">
+          <button class="research-toggle" id="research-toggle">
+            Research mode: enter a dataset user ID directly ↓
+          </button>
+          <div class="research-panel" id="research-panel">
+            <div class="panel-input-row">
+              <div class="input-wrap">
+                <span class="input-icon">🔍</span>
+                <input type="text" id="user-id-input" class="text-input" placeholder="Dataset user ID (e.g. 11373749)" autocomplete="off" />
+              </div>
+              <button class="btn btn-primary" id="cf-submit">Get Recommendations →</button>
+            </div>
+            <p class="research-note">⚠ Only user IDs present in the Steam-200K training dataset (2,329 users) will return results.</p>
+            <div class="sample-pills" style="margin-top:10px">
+              <span class="sample-label">Try:</span>
+              <button class="pill" id="sample-11373749" data-user-id="11373749">11373749 <em style="font-size:11px;opacity:0.6">active</em></button>
+              <button class="pill" id="sample-5250" data-user-id="5250">5250 <em style="font-size:11px;opacity:0.6">casual</em></button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /panel-cf -->
+
+      <!-- ── Panel B: Build Your Profile (Cold-Start) ─────────── -->
       <div class="mode-panel" id="panel-coldstart" role="tabpanel" aria-labelledby="tab-coldstart">
+        <p class="personas-intro">
+          Type in games you enjoy — any titles from your Steam library. Our semantic search
+          finds the closest taste profile in our dataset and generates tailored recommendations.
+        </p>
+
         <div class="tag-input-section">
           <div class="tag-input-box" id="tag-input-container" tabindex="0">
             <div class="tags-list" id="tags-list"></div>
-            <input type="text" id="tag-field" class="tag-field" placeholder="Type a game title and press Enter…" autocomplete="off" />
+            <input type="text" id="tag-field" class="tag-field" placeholder="Type a game and press Enter…" autocomplete="off" />
           </div>
-          <button class="btn btn-primary" id="coldstart-submit">
-            Discover <span class="btn-arrow">→</span>
-          </button>
+          <button class="btn btn-primary" id="coldstart-submit">Find Games →</button>
         </div>
+
         <div class="sample-pills">
           <span class="sample-label">Try a preset:</span>
           <button class="pill sample-tags" id="sample-preset-1" data-tags="Rocket League,Counter-Strike Global Offensive,Psychonauts">
@@ -163,96 +246,104 @@
         </div>
       </div>
 
-      <!-- ── Panel C: Conversational -->
+      <!-- ── Panel C: Describe It (Conversational) ────────────── -->
       <div class="mode-panel" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat">
+        <p class="personas-intro">
+          Describe in plain language what kind of game you're looking for.
+          Our AI reads your intent, searches the game catalog semantically,
+          and ranks results using collaborative filtering if you provide your user ID.
+        </p>
+
         <div class="chat-input-section">
-          <textarea id="chat-query" class="chat-textarea" placeholder="Describe what you're looking for...&#10;e.g. &quot;A dark atmospheric game with a great story and exploration&quot;" rows="3"></textarea>
+          <textarea id="chat-query" class="chat-textarea"
+            placeholder="e.g. &quot;A dark atmospheric game with a great story, something slow-paced and immersive&quot;&#10;or &quot;A fast-paced multiplayer game I can play in short sessions with friends&quot;"
+            rows="4"></textarea>
           <div class="chat-options-row">
-            <div class="input-wrapper input-wrapper--small">
+            <div class="input-wrap input-wrap--sm">
               <span class="input-icon">👤</span>
-              <input type="text" id="chat-user-id" class="text-input text-input--small" placeholder="Steam User ID (optional, for personalised ranking)" autocomplete="off" />
+              <input type="text" id="chat-user-id" class="text-input" placeholder="User ID (optional)" autocomplete="off" />
             </div>
-            <button class="btn btn-primary" id="chat-submit">
-              Find My Games <span class="btn-arrow">→</span>
-            </button>
+            <button class="btn btn-primary" id="chat-submit">Find My Games →</button>
           </div>
         </div>
+
         <div class="sample-pills">
-          <span class="sample-label">Try a query:</span>
-          <button class="pill sample-query" id="sq-horror" data-query="I want a dark atmospheric horror game with great story">horror &amp; atmosphere</button>
-          <button class="pill sample-query" id="sq-rpg" data-query="open world RPG with exploration and crafting">open world RPG</button>
-          <button class="pill sample-query" id="sq-indie" data-query="relaxing indie game with beautiful art and chill vibes">chill indie</button>
+          <span class="sample-label">Try:</span>
+          <button class="pill sample-query" id="sq-horror" data-query="I want a dark atmospheric horror game with a great story and exploration">horror &amp; atmosphere</button>
+          <button class="pill sample-query" id="sq-rpg" data-query="open world RPG with exploration, crafting and deep lore">open world RPG</button>
+          <button class="pill sample-query" id="sq-indie" data-query="relaxing indie game with beautiful art, chill vibes and good music">chill indie</button>
+          <button class="pill sample-query" id="sq-multi" data-query="fast multiplayer game I can play with friends in short sessions">multiplayer</button>
         </div>
       </div>
 
-      <!-- Results area -->
-      <div id="llm-summary-box" class="llm-summary hidden"></div>
-      <div id="results-meta" class="results-meta hidden"></div>
-      <div id="results-grid" class="results-grid" aria-live="polite"></div>
+      <!-- ── Results ───────────────────────────────────────────── -->
+      <div id="results-area" class="results-area hidden">
+        <div class="results-header">
+          <h3 class="results-title" id="results-title">Recommendations</h3>
+          <span class="results-badge" id="results-badge"></span>
+        </div>
+        <div id="llm-summary-box" class="llm-summary hidden"></div>
+        <div id="results-meta" class="results-meta hidden"></div>
+        <div id="results-grid" class="results-grid" aria-live="polite"></div>
+      </div>
+
     </div>
   </section>
 
-  <!-- ── How It Works ───────────────────────────────────────────── -->
+  <!-- ── How It Works ──────────────────────────────────────────── -->
   <section id="how-it-works" class="how-it-works section">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
-        <p class="section-subtitle">End-to-end ML pipeline from raw Steam data to personalised explanations</p>
+        <p class="section-label">The Engine</p>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-sub">
+          End-to-end ML pipeline from raw Steam data to personalised explanations.
+        </p>
       </div>
 
-      <!-- Pipeline diagram -->
+      <!-- Pipeline -->
       <div class="pipeline" aria-label="ML Pipeline">
         <div class="pipeline-step" data-step="1">
           <div class="step-icon">📊</div>
-          <div class="step-content">
-            <h3 class="step-title">Steam Data</h3>
-            <p class="step-desc">200K gameplay rows · playtime as implicit feedback</p>
-          </div>
+          <div class="step-title">Steam Data</div>
+          <div class="step-desc">200K gameplay rows · playtime as implicit feedback</div>
         </div>
         <div class="pipeline-arrow">▶</div>
 
         <div class="pipeline-step" data-step="2">
           <div class="step-icon">⚙️</div>
-          <div class="step-content">
-            <h3 class="step-title">Preprocessing</h3>
-            <p class="step-desc">2,329 users · 1,005 items · leave-one-last split</p>
-          </div>
+          <div class="step-title">Preprocessing</div>
+          <div class="step-desc">2,329 users · 1,005 items · leave-one-last split</div>
         </div>
         <div class="pipeline-arrow">▶</div>
 
         <div class="pipeline-step" data-step="3">
           <div class="step-icon">🧠</div>
-          <div class="step-content">
-            <h3 class="step-title">GMF Training</h3>
-            <p class="step-desc">Generalised Matrix Factorisation · 64-dim embeddings</p>
-          </div>
+          <div class="step-title">GMF Training</div>
+          <div class="step-desc">Generalised Matrix Factorisation · 64-dim · BPR loss</div>
         </div>
         <div class="pipeline-arrow">▶</div>
 
         <div class="pipeline-step" data-step="4">
           <div class="step-icon">🔍</div>
-          <div class="step-content">
-            <h3 class="step-title">FAISS Index</h3>
-            <p class="step-desc">all-MiniLM-L6-v2 · 384-dim · cosine similarity</p>
-          </div>
+          <div class="step-title">FAISS Index</div>
+          <div class="step-desc">all-MiniLM-L6-v2 · 384-dim · cosine similarity</div>
         </div>
         <div class="pipeline-arrow">▶</div>
 
         <div class="pipeline-step" data-step="5">
           <div class="step-icon">✨</div>
-          <div class="step-content">
-            <h3 class="step-title">AI Explanation</h3>
-            <p class="step-desc">Gemini 2.0 Flash Lite · groundedness check · cached</p>
-          </div>
+          <div class="step-title">AI Explanation</div>
+          <div class="step-desc">Gemini 2.0 Flash Lite · groundedness check · cached</div>
         </div>
       </div>
 
       <!-- Feature cards -->
       <div class="feature-grid">
         <div class="feature-card">
-          <div class="feature-icon feature-icon--purple">🤝</div>
+          <div class="feature-icon">🤝</div>
           <h3 class="feature-title">Collaborative Filtering</h3>
-          <p class="feature-desc">GMF model learns from 45,550 user–game interactions. Trained on an RTX 3050 with BPR loss and early stopping.</p>
+          <p class="feature-desc">GMF model learns from 45,550 user–game interactions. Trained with BPR loss and early stopping on an RTX 3050.</p>
           <div class="feature-metric">
             <span class="fmetric-val">30.96%</span>
             <span class="fmetric-label">HR@10</span>
@@ -260,9 +351,9 @@
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon feature-icon--cyan">🔎</div>
+          <div class="feature-icon">🔎</div>
           <h3 class="feature-title">Semantic Search</h3>
-          <p class="feature-desc">FAISS index over 1,005 game embeddings enables cold-start and conversational recs without any user history.</p>
+          <p class="feature-desc">FAISS index over 1,005 game embeddings enables cold-start and conversational discovery without any user history.</p>
           <div class="feature-metric">
             <span class="fmetric-val">&lt;1ms</span>
             <span class="fmetric-label">retrieval latency</span>
@@ -270,20 +361,20 @@
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon feature-icon--green">💡</div>
+          <div class="feature-icon">💡</div>
           <h3 class="feature-title">RAG Explanations</h3>
-          <p class="feature-desc">Each recommendation comes with a grounded 1–2 sentence explanation referencing the user's actual play history.</p>
+          <p class="feature-desc">Each recommendation includes a grounded 1–2 sentence explanation referencing actual play history. Hallucination-checked.</p>
           <div class="feature-metric">
             <span class="fmetric-val">100%</span>
-            <span class="fmetric-label">hallucination-checked</span>
+            <span class="fmetric-label">grounded</span>
           </div>
         </div>
       </div>
 
-      <!-- Model comparison chart -->
+      <!-- Model comparison -->
       <div class="chart-section">
         <h3 class="chart-title">Model Comparison — Hit Rate @10</h3>
-        <p class="chart-subtitle">GMF outperforms all baselines on the Steam dataset (97.85% sparse)</p>
+        <p class="chart-subtitle">GMF outperforms all baselines on the Steam dataset (97.85% sparse matrix)</p>
         <div class="comparison-bars" id="comparison-bars">
           <div class="cbar-row">
             <span class="cbar-label">GMF (ours)</span>
@@ -292,6 +383,7 @@
                 <span class="cbar-val">30.96%</span>
               </div>
             </div>
+            <span class="cbar-winner">Best</span>
           </div>
           <div class="cbar-row">
             <span class="cbar-label">NeuMF</span>
@@ -319,16 +411,18 @@
           </div>
         </div>
       </div>
+
     </div>
   </section>
 
-  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <!-- ── Footer ────────────────────────────────────────────────── -->
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
         <span class="logo-mark logo-mark--sm">GP</span>
         <span class="footer-name">GamePlanner</span>
-        <span class="footer-tagline">· Steam Recommendation Engine</span>
+        <span class="footer-sep">·</span>
+        <span class="footer-tag">Steam Recommendation Engine</span>
       </div>
       <div class="footer-tech">
         <span class="tech-badge">PyTorch</span>
