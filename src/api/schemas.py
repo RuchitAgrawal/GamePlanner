@@ -2,7 +2,7 @@
 Pydantic request and response schemas for the FastAPI layer.
 """
 
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -11,7 +11,11 @@ class ItemResult(BaseModel):
     title: str
     tags: str = ""
     score: float
-    explanation: str | None = None
+    explanation: Optional[str] = None
+    # F-E1: closest seed game (for cold-start semantic explanations)
+    closest_seed: Optional[str] = None
+    # F-E1: human-readable semantic note generated from closest_seed
+    semantic_note: Optional[str] = None
 
 
 class RecommendResponse(BaseModel):
@@ -38,6 +42,10 @@ class ColdStartRequest(BaseModel):
 class ColdStartResponse(BaseModel):
     recommendations: list[ItemResult]
     count: int
+    # F-E2: optional LLM summary paragraph for the full result set
+    llm_summary: Optional[str] = None
+    # F-E1: seed games actually matched in the catalog
+    matched_seeds: list[str] = []
 
 
 class ChatRequest(BaseModel):
