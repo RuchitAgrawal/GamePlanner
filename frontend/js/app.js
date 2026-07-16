@@ -103,6 +103,23 @@ async function fetchPersona(personaKey) {
   try {
     const data = await api.coldstart(persona.seeds, 8);
     const items = data.recommendations ?? [];
+
+    // F-E2: show LLM summary paragraph above results
+    if (data.llm_summary) {
+      renderLLMSummary(data.llm_summary);
+    }
+
+    // F-E1/E2: show which seeds were matched in catalog
+    const matchedSeeds = data.matched_seeds ?? [];
+    const metaEl = document.getElementById('results-meta');
+    if (metaEl && matchedSeeds.length) {
+      metaEl.innerHTML = `
+        <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint)">Seeds matched</span>
+        ${matchedSeeds.map(s => `<span class="seed-tag" style="font-size:12px">${escHtmlLocal(s)}</span>`).join('')}
+      `;
+      metaEl.classList.remove('hidden');
+    }
+
     renderCards(items, 'coldstart', persona.name);
   } catch (err) {
     renderError(err.message);
@@ -199,6 +216,21 @@ async function fetchColdstart() {
   renderSkeletons(8);
   try {
     const data = await api.coldstart(tags, 8);
+
+    // F-E2: LLM summary paragraph
+    if (data.llm_summary) renderLLMSummary(data.llm_summary);
+
+    // F-E1/E2: matched seeds display
+    const matchedSeeds = data.matched_seeds ?? [];
+    const metaEl = document.getElementById('results-meta');
+    if (metaEl && matchedSeeds.length) {
+      metaEl.innerHTML = `
+        <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint)">Seeds matched</span>
+        ${matchedSeeds.map(s => `<span class="seed-tag" style="font-size:12px">${escHtmlLocal(s)}</span>`).join('')}
+      `;
+      metaEl.classList.remove('hidden');
+    }
+
     renderCards(data.recommendations ?? [], 'coldstart', 'your profile');
   } catch (err) {
     renderError(err.message);
