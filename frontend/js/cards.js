@@ -104,7 +104,6 @@ function renderLLMSummary(text) {
  * @param {string}  [label]  - optional header label (persona name, etc.)
  */
 function renderCards(items, mode, label) {
-  clearResults();
   if (!items?.length) { renderEmpty(); return; }
 
   resultArea()?.classList.remove('hidden');
